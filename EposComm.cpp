@@ -9,51 +9,70 @@
 
 
 #define BUFFSIZE 512
+#define IN_PREFIX "-IN"
+#define OUT_PREFIX "-OUT"
 
 
-
-
-EposComm::EposComm(std::string path):
-m_path(path),
+EposComm::EposComm(std::string basePath, eposMode mode):
+m_path(basePath),
+m_mode(mode),
 m_stop(false)
 {
-    mkfifo(m_path.c_str(),0600);    
 }
 EposComm::~EposComm()
-{
-    unlink(m_path.c_str());
+{    
 }
 int EposComm::Initialize()
 {
-    if ( (m_fdWrite=open(m_path.c_str(), O_WRONLY)) < 0){
-        std::cout << " Fail to open Write fd on "<<m_path << " !";
-        return -1;
+    unlink(m_path.c_str());
+    std::cout << "Epos comm unlinking old "<<m_path << " ."<< std::endl;
+   
+    /* create FIFO */
+    if (mkfifo(m_path.c_str(), S_IRUSR | S_IWUSR) < 0) {
+        if (errno == EEXIST) { // already exists, ok 
+        }
+
+        /* error */
+        else {
+            std::cout << "Epos comm mkfifo Fail on "<<m_path << " ."<< std::endl;
+            return -1;
+        }
     }
-    if ( (m_fdRead=open(m_path.c_str(), O_RDONLY)) < 0){
-        std::cout << " Fail to open Read fd on "<<m_path << " !";
-        return -2;
-    }
+   
+    // Start thread
+	this->m_read = std::thread(&EposComm::ListenCommands, this);
+    std::cout << "Epos comm  Listener Correctly Launched on "<<m_path << " ."<< std::endl;
     return 0;
 }
 int EposComm::Terminate()
 {
-    close(m_fdWrite);
-    close(m_fdRead);
+    m_stop = true ;    
+    unlink(m_path.c_str());
     return 0;
 }
 int EposComm::SendCommand(EposCommand  command)
 {
-    std::string cmd = command.Serialize();
-     if( write(m_fdWrite, cmd.c_str(), cmd.size() ) != cmd.size() ) {
-        std::cout << " Fail Write "<<cmd.size()<<" octect  on "<<m_path << " !";
+    std::cout<< "------- SendCommand .. ." <<std::endl;
+    // open write first !
+    if ( (m_fdWrite=open(m_path.c_str(), O_WRONLY)) < 0){
+        std::cout << " Fail to open Write fd on "<<m_path << " !"<< std::endl;
         return -1;
     }
+    std::string cmd = command.Serialize();
+    std::cout<< "------- SendCommand .."<<cmd<<" ." <<std::endl;
+    std::cout <<"["<<m_path <<"] Will Send  "<<cmd.size()<<"   :\""<<cmd <<"\" !"<< std::endl;
+     if( write(m_fdWrite, cmd.c_str(), cmd.size() ) != cmd.size() ) {
+        std::cout << " Fail Write "<<cmd.size()<<" octect  on "<<m_path << " !"<< std::endl;
+        return -1;
+    }
+    
+    close(m_fdWrite);
     return 0;
 }
-EposCommand * EposComm::ReceiveCommand(){
+EposCommand * EposComm::ReceiveCommand(){    
     std::unique_lock<std::mutex> lock(this->m_mutex);
     this->m_cond.wait(lock,[&]{return m_stop || !m_queue.empty();});
-    if ( !this->m_queue.empty() ){
+    if ( !this->m_queue.empty() ){        
         EposCommand * rc(std::move(this->m_queue.back()));
         this->m_queue.pop_back();
         return rc;
@@ -71,15 +90,18 @@ int EposComm::ListenCommands()
     std::string token ;
     std::string received="";
 
-    while(!m_stop || (n=read(m_fdRead, buff , BUFFSIZE) ) > 0){
-        std::cout<<" <-- Received  ... "<< n;        
+      // open fd read
+    if ( (m_fdRead=open(m_path.c_str(), O_RDONLY)) < 0){
+        std::cout << " Fail to open Read fd on "<<m_path << " !"<< std::endl;
+        return -2;
+    }
+
+    while(!m_stop && (n=read(m_fdRead, buff , BUFFSIZE) ) > 0){
+        std::cout<<"["<<m_path <<"] <-- Received  ... "<< n<< std::endl;
         received.append(buff,n);
-        std::cout<<" <-- ALL Received  ... "<< received;
         //Find END; ?
         while ((found = received.find(END_STRING)) != std::string::npos) {
-            std::cout << "first 'END_STRING' found at: " << found ;
             token = received.substr(0, found);            
-            std::cout << " COMMAND :"<< token << std::endl;
             received.erase(0, found + END_STRING_LENGTH);
             //push to queue !
             {            
@@ -89,10 +111,7 @@ int EposComm::ListenCommands()
             this->m_cond.notify_one();
         }
     }
+
+    close(m_fdRead);
     return 0;
-}
-void EposComm::StartListener()
-{
-    // Start thread
-	std::thread read(&EposComm::ListenCommands, this);	
 }
