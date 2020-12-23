@@ -1,11 +1,5 @@
-#include <sstream>
 #include <iostream>
-#include <vector>
 #include <string>
-#include <deque>
-#include <mutex>
-#include <thread>
-#include <condition_variable>
 
 #include "EposCommand.h"
 
@@ -13,32 +7,49 @@
 #define EPOS_COMM_H
 
 enum eposMode{
-    ECOMM_SERVER = 0 ,
-    ECOMM_CLIENT
+    ECOMM_READ = 0 ,
+    ECOMM_WRITE
 } ;
+
+#define USE_MSG_QUE 1
+
+#ifdef  USE_MSG_QUE
+
+#define ProjectId 123
+#define MsgLen    512
+#define MsgCount  6
+
+typedef struct {
+  long type;                 /* must be of type long */
+  char payload[MsgLen + 1];  /* bytes in the message */
+} queuedMessage;
+
+#endif
+
 
 class EposComm {
  
 public:   
-    EposComm(std::string basePath, eposMode mode = eposMode::ECOMM_SERVER);    
+    EposComm(std::string basePath, eposMode mode = eposMode::ECOMM_READ);    
     virtual ~EposComm();
 
     int Initialize();
     int Terminate();
-    int SendCommand(EposCommand  command);
-    EposCommand * ReceiveCommand();
+    int SendCommand(EposCommand  command, long type = 1);
+    EposCommand * ReceiveCommand(long type = 1);
 
 private:    
     std::string m_path;
+    std::string m_received;
     eposMode    m_mode;
+    bool m_stop;
+#ifdef  USE_MSG_QUE
+    int m_qid;
+#else
     int m_fdWrite;
     int m_fdRead;
-    bool m_stop;
-    std::thread                 m_read;
-    std::mutex                   m_mutex;
-    std::deque<EposCommand*> m_queue;
-    std::condition_variable      m_cond;
-    int  ListenCommands();
+#endif
+
 };
 
 

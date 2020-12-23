@@ -17,10 +17,8 @@ EposCommand::~EposCommand(){
 std::string EposCommand::Serialize()
 {
     std::string  params="";
-    std::cout<< "------- Serializing  .. "<<m_params.size()<<std::endl;
     for (int i=0;i<m_params.size();i++)
         params+= m_params[i] + SEP_STRING;
-    std::cout<< "------- Serializing  .. " <<std::endl;
     return std::string(m_id + SEP_STRING + m_command + SEP_STRING + params + END_STRING);
 }
         

@@ -6,65 +6,60 @@
 #include "EposComm.h"
 #include "EposCommand.h"
 
-EposComm * In = NULL;
-//EposComm * Out = NULL;
+int MAX_count=1001 ;
+int count = 1 ;
+EposComm * Fifo = NULL;
 
 int play(){
     std::vector<std::string> vc;
-    vc.push_back("ADSD");
-    vc.push_back("BDXCVBDFV");
-
-    for(int i=0;i<1000;i++){
-        std::cout<< "------- Sending .. "<<i<<"." <<std::endl;
-        In->SendCommand(
+    vc.push_back("---");
+    vc.push_back("+++");
+    usleep(2000000);
+    while(count<MAX_count){
+        std::cout<<"["<<count<<"/"<<MAX_count<<"] : Sending .. "<<count<<"." <<std::endl;        
+        Fifo->SendCommand(
                 EposCommand(
-                    std::to_string(i+21542),
+                    std::to_string(count),
                     ">>>>->->->",
-                    vc));
-  /*      Out->SendCommand(
-                EposCommand(
-                    std::to_string(i+564872),
-                    "<----<-<-<-",
-                    vc));    
-    */}
+                    vc));   
+        count++;
+    }
+    std::cout << "Send ALL !"<< std::endl;
     return 0;
 }
-int receiveIn(){
-   while(1){
-       std::cout<< "------- [***IN***] Waiting .. "<<std::endl;
-        EposCommand * cmd = In->ReceiveCommand();
-        std::cout<< "------- [***IN***] Recevied Comand ID "<< cmd->m_id <<"."<<std::endl;
+int receiveFifo(){
+   while(count<MAX_count){
+        EposCommand * cmd = Fifo->ReceiveCommand();
+        count ++;
+        std::cout<<"["<<count<<"/"<<MAX_count<<"] : Recevied  ID "<< cmd->m_id <<" ::>>."<<std::endl;
     }
+    std::cout << "Received ALL !"<< std::endl;
     return 0;
-}/*
-int receiveOut(){
-   while(1){
-       std::cout<< "------- [***OUT***] Waiting .. "<<std::endl;
-        EposCommand * cmd = Out->ReceiveCommand();
-        std::cout<< "------ [***OUT***] Recevied Comand ID "<< cmd->m_id <<"."<<std::endl;
-    }
-    return 0;
-}*/
+}
+#define path "/tmp"
 int main(int argc, char **argv) {
-
-    // (1)-->(2) Direction Fifo /tmp/fifo-IN
-    In = new EposComm("/tmp/fifo-IN");
-    if(In->Initialize() < 0){
-        std::cout << "Error to initiate In Fifo !" << std::endl;
-        return -1;
+    if(argc == 1 ){
+        Fifo = new EposComm(path,eposMode::ECOMM_READ);
+        if(Fifo->Initialize() < 0){
+            std::cout << "Error to initiate In Fifo !" << std::endl;
+            return -1;
+        }
+        std::cout << "Initilized correctly READ Mode ! " << std::endl;
+        std::thread test(receiveFifo);
+        test.join();
     }
-    // (2)-->(1) Direction Fifo /tmp/fifo-OUT
-   /* Out = new EposComm("/tmp/fifo-OUT");
-    if(Out->Initialize() < 0){
-        std::cout << "Error to initiate Out Fifo !" << std::endl;
-        return -2;
+    else {
+        Fifo = new EposComm(path ,eposMode::ECOMM_WRITE);
+        if(Fifo->Initialize() < 0){
+            std::cout << "Error to initiate In Fifo !" << std::endl;
+            return -1;
+        }
+        std::cout << "Initilized correctly WRITE Mode ! " << std::endl;
+        std::thread test(play);
+        test.join();
     }
-    */std::cout << "Initilized correctly !" << std::endl;
-
-    std::thread test1(receiveIn);
-    //std::thread test2(receiveOut);    
-    std::thread test(play);
-    test.join();
-    usleep(1000000);
+    
+    std::cout << "Bye !"<< std::endl;
+    usleep(100000);
     return 0;
 }
