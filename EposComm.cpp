@@ -71,7 +71,6 @@ int EposComm::Initialize()
         std::cout << "WRITER Epos comm  Listener Correctly Launched on "<<m_path << " ."<< std::endl;
     }
 #endif
-
     return 0;
 }
 int EposComm::Terminate()
@@ -80,12 +79,13 @@ int EposComm::Terminate()
     /** remove the queue **/
     if (msgctl(m_qid, IPC_RMID, NULL) < 0)  /* NULL = 'no flags' */
         report_and_exit("trouble removing queue...");
-#endif  
+#else
     if(m_mode == eposMode::ECOMM_READ) {        
         close(m_fdRead);
     }else {        
         close(m_fdWrite);         
-    }      
+    }   
+#endif         
     unlink(m_path.c_str());
     return 0;
 }
@@ -120,7 +120,7 @@ EposCommand * EposComm::ReceiveCommand(long type){
     }  
 #ifdef  USE_MSG_QUE 
     queuedMessage msg; /* defined in queue.h */
-    if (msgrcv(m_qid, &msg, sizeof(msg), type, MSG_NOERROR |IPC_NOWAIT ) < 0)
+    if (msgrcv(m_qid, &msg, sizeof(msg), type, MSG_NOERROR  ) < 0)
       puts("msgrcv trouble...\n");
     printf("%s received as type %i\n", msg.payload, (int) msg.type);
     return EposCommand::Deserialize(msg.payload);

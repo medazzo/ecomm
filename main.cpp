@@ -25,6 +25,8 @@ int play(){
                     ">>>>->->->",
                     vc));   
         count++;
+        // minnimum time to wait for; unless queue will miss somes messages !
+        usleep(500);
     }
     std::cout << "Send ALL !"<< std::endl;
     return 0;
@@ -45,7 +47,7 @@ int receiveFifo(){
 }
 
 #ifdef  USE_MSG_QUE
-#define path "/tmp"
+#define path "/etc"
 #else
 #define path "/tmp/fgifo"
 #endif

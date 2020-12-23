@@ -11,7 +11,7 @@ enum eposMode{
     ECOMM_WRITE
 } ;
 
-//#define USE_MSG_QUE 1
+#define USE_MSG_QUE 1
 
 #ifdef  USE_MSG_QUE
 
