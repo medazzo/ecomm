@@ -11,15 +11,17 @@ int count = 1 ;
 EposComm * Fifo = NULL;
 
 int play(){
+    int id=0;
     std::vector<std::string> vc;
     vc.push_back("---");
     vc.push_back("+++");
     usleep(2000000);
     while(count<MAX_count){
-        std::cout<<"["<<count<<"/"<<MAX_count<<"] : Sending .. "<<count<<"." <<std::endl;        
+        id=count*555;
+        std::cout<<"["<<count<<"/"<<MAX_count<<"] : Sending .. "<<id<<"." <<std::endl;        
         Fifo->SendCommand(
                 EposCommand(
-                    std::to_string(count),
+                    std::to_string(id),
                     ">>>>->->->",
                     vc));   
         count++;
@@ -30,13 +32,23 @@ int play(){
 int receiveFifo(){
    while(count<MAX_count){
         EposCommand * cmd = Fifo->ReceiveCommand();
-        count ++;
-        std::cout<<"["<<count<<"/"<<MAX_count<<"] : Recevied  ID "<< cmd->m_id <<" ::>>."<<std::endl;
+        if(cmd  != NULL){
+            count ++;
+            std::cout<<"["<<count<<"/"<<MAX_count<<"] : Recevied  ID "<< cmd->m_id <<" >>."<<std::endl;
+        }else {
+            std::cout<<"["<<count<<"/"<<MAX_count<<"] : ERROR  NULL, END of Stream :: quit >>."<<std::endl;
+            return -1;
+        }
     }
     std::cout << "Received ALL !"<< std::endl;
     return 0;
 }
+
+#ifdef  USE_MSG_QUE
 #define path "/tmp"
+#else
+#define path "/tmp/fgifo"
+#endif
 int main(int argc, char **argv) {
     if(argc == 1 ){
         Fifo = new EposComm(path,eposMode::ECOMM_READ);

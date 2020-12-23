@@ -11,12 +11,12 @@ enum eposMode{
     ECOMM_WRITE
 } ;
 
-#define USE_MSG_QUE 1
+//#define USE_MSG_QUE 1
 
 #ifdef  USE_MSG_QUE
 
 #define ProjectId 123
-#define MsgLen    512
+#define MsgLen    1024
 #define MsgCount  6
 
 typedef struct {
@@ -42,7 +42,6 @@ private:
     std::string m_path;
     std::string m_received;
     eposMode    m_mode;
-    bool m_stop;
 #ifdef  USE_MSG_QUE
     int m_qid;
 #else
