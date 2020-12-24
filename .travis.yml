@@ -11,7 +11,7 @@ script:
   - cmake ..
   - make
   - cd ..
-  - mkdir buildv
+  - mkdir build-MQ
   - cd build-MQ
   - cmake -DUSE_MESSAGE_QUEUE=ON ..
   - make  
