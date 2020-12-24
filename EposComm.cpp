@@ -60,12 +60,14 @@ int EposComm::Initialize()
         // open fd read
         if ( (m_fdRead=open(m_path.c_str(), O_RDONLY)) < 0){
             std::cout << " Fail to open Read fd on "<<m_path << " !"<< std::endl;
+            perror(m_path.c_str());
             return -1;
         }
                 
     }else {
         if ( (m_fdWrite=open(m_path.c_str(),O_CREAT | O_WRONLY)) < 0){
             std::cout << " Fail to open Write fd on "<<m_path << " !"<< std::endl;
+            perror(m_path.c_str());
             return -1;
         }
         std::cout << "WRITER Epos comm  Listener Correctly Launched on "<<m_path << " ."<< std::endl;
