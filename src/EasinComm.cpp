@@ -7,14 +7,14 @@
 #include <sys/ipc.h>
 #include <sys/msg.h>
 #include <stdlib.h>
-#include "EposComm.h"
+#include "EasinComm.h"
 
 #define report_and_exit(msg) {perror(msg);exit(-1); /* EXIT_FAILURE */}
 
 #define BUFFSIZE 5
 
 
-EposComm::EposComm(std::string basePath, eposMode mode):
+EasinComm::EasinComm(std::string basePath, EasinMode mode):
 m_path(basePath),
 m_mode(mode),
 m_received("")
@@ -26,10 +26,10 @@ m_received("")
     m_fdRead = 0;
 #endif
 }
-EposComm::~EposComm()
+EasinComm::~EasinComm()
 {    
 }
-int EposComm::Initialize()
+int EasinComm::Initialize()
 {
 //   unlink(m_path.c_str());
 #ifdef  USE_MSG_QUE
@@ -39,7 +39,7 @@ int EposComm::Initialize()
     m_qid = msgget(key, 0666 | IPC_CREAT);
     if (m_qid < 0) report_and_exit("couldn't get queue id...");
 #else    
-    if(m_mode == eposMode::ECOMM_WRITE) {
+    if(m_mode == EasinMode::ECOMM_WRITE) {
         /* create FIFO */
         if (mkfifo(m_path.c_str(), 0666) < 0)                 /* read/write for user/group/others */
         {
@@ -48,12 +48,12 @@ int EposComm::Initialize()
 
             /* error */
             else {
-                std::cout << "Epos comm mkfifo Fail on "<<m_path << " ."<< std::endl;
+                std::cout << "Easin comm mkfifo Fail on "<<m_path << " ."<< std::endl;
                 return -1;
             }
         }  
     }
-    if(m_mode == eposMode::ECOMM_READ) {
+    if(m_mode == EasinMode::ECOMM_READ) {
         // open fd read
         if ( (m_fdRead=open(m_path.c_str(), O_RDONLY)) < 0){
             std::cout << " Fail to open Read fd on "<<m_path << " !"<< std::endl;
@@ -67,19 +67,19 @@ int EposComm::Initialize()
             perror(m_path.c_str());
             return -1;
         }
-        std::cout << "WRITER Epos comm  Listener Correctly Launched on "<<m_path << " ."<< std::endl;
+        std::cout << "WRITER Easin comm  Listener Correctly Launched on "<<m_path << " ."<< std::endl;
     }
 #endif
     return 0;
 }
-int EposComm::Terminate()
+int EasinComm::Terminate()
 {
 #ifdef  USE_MSG_QUE       
     /** remove the queue **/
     if (msgctl(m_qid, IPC_RMID, NULL) < 0)  /* NULL = 'no flags' */
         report_and_exit("trouble removing queue...");
 #else
-    if(m_mode == eposMode::ECOMM_READ) {        
+    if(m_mode == EasinMode::ECOMM_READ) {        
         close(m_fdRead);
     }else {        
         close(m_fdWrite);         
@@ -88,10 +88,10 @@ int EposComm::Terminate()
     unlink(m_path.c_str());
     return 0;
 }
-int EposComm::SendCommand(EposCommand  command, long type)
+int EasinComm::SendCommand(EasinCommand  command, long type)
 {
-    if(m_mode == eposMode::ECOMM_READ){
-        std::cout << "Epos comm Fail to Send command in READ MODE !."<< std::endl;
+    if(m_mode == EasinMode::ECOMM_READ){
+        std::cout << "Easin comm Fail to Send command in READ MODE !."<< std::endl;
         return -1;
     }
     std::string cmd = command.Serialize();    
@@ -112,16 +112,16 @@ int EposComm::SendCommand(EposCommand  command, long type)
 #endif    
     return 0;
 }
-EposCommand * EposComm::ReceiveCommand(long type){  
-    if(m_mode == eposMode::ECOMM_WRITE){
-        std::cout << "Epos comm Fail to Receive command in WRITE MODE !."<< std::endl;
+EasinCommand * EasinComm::ReceiveCommand(long type){  
+    if(m_mode == EasinMode::ECOMM_WRITE){
+        std::cout << "Easin comm Fail to Receive command in WRITE MODE !."<< std::endl;
         return NULL;
     }  
 #ifdef  USE_MSG_QUE 
     queuedMessage msg; /* defined in queue.h */
     if (msgrcv(m_qid, &msg, sizeof(msg), type, MSG_NOERROR  ) < 0)
       puts("msgrcv trouble...\n");
-    return EposCommand::Deserialize(msg.payload);
+    return EasinCommand::Deserialize(msg.payload);
 #else
     ssize_t n=0;
     char buff[BUFFSIZE];
@@ -139,7 +139,7 @@ EposCommand * EposComm::ReceiveCommand(long type){
         if((found = m_received.find(END_STRING)) != std::string::npos){
             token = m_received.substr(0, found);            
             m_received.erase(0, found + END_STRING_LENGTH);
-            return EposCommand::Deserialize(token);
+            return EasinCommand::Deserialize(token);
         }
     }  
     std::cout<<"["<<m_path <<"] <-- unknown error ! "<<m_received<<"."<< std::endl;

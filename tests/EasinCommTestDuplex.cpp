@@ -3,14 +3,14 @@
 #include <vector>
 #include <unistd.h>
 
-#include "EposCommBi.h"
-#include "EposCommand.h"
+#include "EasinCommBi.h"
+#include "EasinCommand.h"
 
-EposCommBi * line;
+EasinCommBi * line;
 
 int MAX_count=500000 ;
 
-int play(EposCommBi * line){
+int play(EasinCommBi * line){
     int count = 1 ;
     int id=0;
     std::vector<std::string> vc;
@@ -23,7 +23,7 @@ int play(EposCommBi * line){
             std::cout<<"Write_on_IN :["<<count<<"/"<<MAX_count<<"] : Sending .. "<<id<<"." <<std::endl;
         else
             std::cout<<"Write_on_OUT:["<<count<<"/"<<MAX_count<<"] : Sending .. "<<id<<"." <<std::endl;
-        line->SendCommand(EposCommand(std::to_string(id),"cmd",vc));   
+        line->SendCommand(EasinCommand(std::to_string(id),"cmd",vc));   
         count++;
         // minimum time to wait for; unless queue will miss somes messages (not a problem for Fifo) !
         usleep(500);
@@ -31,10 +31,10 @@ int play(EposCommBi * line){
     std::cout << "Send ALL !"<< std::endl;
     return 0;
 }
-int receiveFifo(EposCommBi * line){
+int receiveFifo(EasinCommBi * line){
     int count = 1 ;
     while(count<MAX_count){
-        EposCommand * cmd = line->ReceiveCommand();
+        EasinCommand * cmd = line->ReceiveCommand();
         if(cmd  != NULL){
             count ++;
             if(line->IsInversed()) 
@@ -62,10 +62,10 @@ int receiveFifo(EposCommBi * line){
 int main(int argc, char **argv) {    
      std::cout << "!   ! !! Welcome " <<argc<< std::endl;
     if(argc == 1 ){ // No prameter Call !
-        line = new EposCommBi(pathi, patho, false );      
+        line = new EasinCommBi(pathi, patho, false );      
     }
     else {
-        line = new EposCommBi(pathi, patho, true);
+        line = new EasinCommBi(pathi, patho, true);
     }
 
     if(line->Initialize() < 0){

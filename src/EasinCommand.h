@@ -6,20 +6,20 @@
 #include <mutex>
 #include <condition_variable>
 
-#ifndef EPOS_COMMAND_H
-#define EPOS_COMMAND_H
+#ifndef Easin_COMMAND_H
+#define Easin_COMMAND_H
 
 #define END_STRING "END;"
 #define END_STRING_LENGTH 4
 #define SEP_STRING ";"
 
 
-class EposCommand {
+class EasinCommand {
 public:
-    EposCommand(std::string id,std::string command,std::vector<std::string> & params );
-    virtual ~EposCommand();
+    EasinCommand(std::string id,std::string command,std::vector<std::string> & params );
+    virtual ~EasinCommand();
     std::string Serialize();
-    static EposCommand * Deserialize(std::string command);
+    static EasinCommand * Deserialize(std::string command);
  
     std::string m_id;
     std::string m_command;
@@ -28,5 +28,5 @@ public:
 
 
 
-#endif /* EPOS_COMMAND_H */
+#endif /* Easin_COMMAND_H */
 

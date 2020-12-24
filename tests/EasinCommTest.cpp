@@ -3,12 +3,12 @@
 #include <vector>
 #include <unistd.h>
 
-#include "EposComm.h"
-#include "EposCommand.h"
+#include "EasinComm.h"
+#include "EasinCommand.h"
 
 int MAX_count=1001 ;
 int count = 1 ;
-EposComm * Fifo = NULL;
+EasinComm * Fifo = NULL;
 
 int play(){
     int id=0;
@@ -19,7 +19,7 @@ int play(){
     while(count<MAX_count){
         id=count*555;
         std::cout<<"["<<count<<"/"<<MAX_count<<"] : Sending .. "<<id<<"." <<std::endl;        
-        Fifo->SendCommand(EposCommand(std::to_string(id),"cmd",vc));   
+        Fifo->SendCommand(EasinCommand(std::to_string(id),"cmd",vc));   
         count++;
         // minimum time to wait for; unless queue will miss somes messages (not a problem for Fifo) !
         usleep(500);
@@ -29,7 +29,7 @@ int play(){
 }
 int receiveFifo(){
    while(count<MAX_count){
-        EposCommand * cmd = Fifo->ReceiveCommand();
+        EasinCommand * cmd = Fifo->ReceiveCommand();
         if(cmd  != NULL){
             count ++;
             std::cout<<"["<<count<<"/"<<MAX_count<<"] : Recevied  ID "<< cmd->m_id <<" >>."<<std::endl;
@@ -49,7 +49,7 @@ int receiveFifo(){
 #endif
 int main(int argc, char **argv) {
     if(argc == 1 ){
-        Fifo = new EposComm(path,eposMode::ECOMM_READ);
+        Fifo = new EasinComm(path,EasinMode::ECOMM_READ);
         if(Fifo->Initialize() < 0){
             std::cout << "Error to initiate In Fifo !" << std::endl;
             return -1;
@@ -59,7 +59,7 @@ int main(int argc, char **argv) {
         test.join();
     }
     else {
-        Fifo = new EposComm(path ,eposMode::ECOMM_WRITE);
+        Fifo = new EasinComm(path ,EasinMode::ECOMM_WRITE);
         if(Fifo->Initialize() < 0){
             std::cout << "Error to initiate In Fifo !" << std::endl;
             return -1;

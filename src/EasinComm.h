@@ -1,12 +1,12 @@
 #include <iostream>
 #include <string>
 
-#include "EposCommand.h"
+#include "EasinCommand.h"
 
-#ifndef EPOS_COMM_H
-#define EPOS_COMM_H
+#ifndef Easin_COMM_H
+#define Easin_COMM_H
 
-enum eposMode{
+enum EasinMode{
     ECOMM_READ = 0 ,
     ECOMM_WRITE
 } ;
@@ -26,21 +26,21 @@ typedef struct {
 #endif
 
 
-class EposComm {
+class EasinComm {
  
 public:   
-    EposComm(std::string basePath, eposMode mode = eposMode::ECOMM_READ);    
-    virtual ~EposComm();
+    EasinComm(std::string basePath, EasinMode mode = EasinMode::ECOMM_READ);    
+    virtual ~EasinComm();
 
     int Initialize();
     int Terminate();
-    int SendCommand(EposCommand  command, long type = 1);
-    EposCommand * ReceiveCommand(long type = 1);
+    int SendCommand(EasinCommand  command, long type = 1);
+    EasinCommand * ReceiveCommand(long type = 1);
 
 private:    
     std::string m_path;
     std::string m_received;
-    eposMode    m_mode;
+    EasinMode    m_mode;
 #ifdef  USE_MSG_QUE
     int m_qid;
 #else
@@ -51,5 +51,5 @@ private:
 };
 
 
-#endif /* EPOS_COMM_H */
+#endif /* Easin_COMM_H */
 
