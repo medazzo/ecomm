@@ -95,14 +95,14 @@ public:
         }
         if(m_mode == EasinMode::ECOMM_READ) {
             // open fd read
-            if ( (m_fdRead=open(m_path.c_str(), O_RDONLY)) < 0){
+            if ( (m_fdRead=open(m_path.c_str(), O_RDONLY), 0755) < 0){
                 std::cout << " Fail to open Read fd on "<<m_path << " !"<< std::endl;
                 perror(m_path.c_str());
                 return -1;
             }
                     
         }else {
-            if ( (m_fdWrite=open(m_path.c_str(),O_CREAT | O_WRONLY)) < 0){
+            if ( (m_fdWrite=open(m_path.c_str(),O_CREAT | O_WRONLY), 0755) < 0){
                 std::cout << " Fail to open Write fd on "<<m_path << " !"<< std::endl;
                 perror(m_path.c_str());
                 return -1;
