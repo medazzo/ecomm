@@ -8,7 +8,7 @@
 
 EasinCommBi<EasinCommand> * line;
 
-int MAX_count=10000 ;
+int MAX_count=10 ;
 
 int play(EasinCommBi<EasinCommand> * line){
     int count = 1 ;
@@ -60,13 +60,19 @@ int receiveFifo(EasinCommBi<EasinCommand> * line){
 #define pathi "/tmp/Igifo"
 #define patho "/tmp/Ogifo"
 #endif
-int main(int argc, char **argv) {    
-     std::cout << "!   ! !! Welcome " <<argc<< std::endl;
-    if(argc == 1 ){ // No prameter Call !
+int main(int argc, char **argv) {        
+    if(argc == 1 || argc > 2  ){
+        std::cout << "Full duplex ! Please pick a Side  : SIDE1 | SIDE2 !!"<<std::endl;
+        return -1;
+    }
+    if(std::string(argv[1]) == "SIDE1" ){
         line = new EasinCommBi<EasinCommand>(pathi, patho, false );      
     }
-    else {
+    else if(std::string(argv[1]) == "SIDE2" ){
         line = new EasinCommBi<EasinCommand>(pathi, patho, true);
+    }else {
+        std::cout << "Full duplex ! Please pick a Side  : SIDE1 | SIDE2 !!"<<std::endl;
+        return -1;
     }
 
     if(line->Initialize() < 0){

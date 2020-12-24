@@ -6,7 +6,7 @@
 #include "EasinComm.h"
 #include "EasinCommand.h"
 
-int MAX_count=10000 ;
+int MAX_count=10 ;
 int count = 1 ;
 EasinComm<EasinCommand> * Fifo = NULL;
 
@@ -50,7 +50,11 @@ int receiveFifo(){
 #define path "/tmp/fgifo"
 #endif
 int main(int argc, char **argv) {
-    if(argc == 1 ){
+    if(argc == 1 || argc > 2  ){
+        std::cout << "Half duplex ! Please chose Mode : RECEIVER | SENDER !!"<<std::endl;
+        return -1;
+    }
+    if(std::string(argv[1]) == "RECEIVER" ){
         Fifo = new EasinComm<EasinCommand>(path,EasinMode::ECOMM_READ);
         if(Fifo->Initialize() < 0){
             std::cout << "Error to initiate In Fifo !" << std::endl;
@@ -60,7 +64,7 @@ int main(int argc, char **argv) {
         std::thread test(receiveFifo);
         test.join();
     }
-    else {
+    else if(std::string(argv[1]) == "SENDER" ){
         Fifo = new EasinComm<EasinCommand>(path ,EasinMode::ECOMM_WRITE);
         if(Fifo->Initialize() < 0){
             std::cout << "Error to initiate In Fifo !" << std::endl;
@@ -69,6 +73,9 @@ int main(int argc, char **argv) {
         std::cout << "Initilized correctly WRITE Mode ! " << std::endl;
         std::thread test(play);
         test.join();
+    }else {     
+        std::cout << " !! Pelase chose Mode : RECEIVER | SENDER !!"<<std::endl;
+        return -1;    
     }
     
     std::cout << "Bye !"<< std::endl;

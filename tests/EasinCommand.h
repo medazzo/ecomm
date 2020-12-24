@@ -17,6 +17,12 @@ public:
         m_command = command ;
         m_params = params ;
     };
+    
+    virtual ~EasinCommand(){
+
+    };
+
+    std::string getId(){ return m_id;};
 
     EasinCommand(std::string command)
     {
@@ -34,10 +40,6 @@ public:
         }
     };
 
-    virtual ~EasinCommand(){
-
-    };
-
     std::string Serialize(){
         std::string  params="";
         for (int i=0;i<m_params.size();i++)
@@ -45,7 +47,6 @@ public:
         return std::string(m_id + SEP_STRING + m_command + SEP_STRING + params + END_STRING);
     };
 
-    std::string getId(){ return m_id;};
 private:
     std::string m_id;
     std::string m_command;

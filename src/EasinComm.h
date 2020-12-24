@@ -19,11 +19,9 @@ enum EasinMode{
     ECOMM_WRITE
 } ;
 
-
-#define END_STRING "END;"
-#define END_STRING_LENGTH 4
-#define SEP_STRING ";"
-
+#define END_STRING          "END;"
+#define END_STRING_LENGTH   4
+#define SEP_STRING          ";"
 
 #ifdef  USE_MESSAGE_QUEUE
 
