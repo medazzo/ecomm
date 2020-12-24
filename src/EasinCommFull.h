@@ -2,18 +2,18 @@
 
 #include "EasinComm.h"
 
-#ifndef Easin_COMM_BI_H
-#define Easin_COMM_BI_H
+#ifndef Easin_COMM_FULL_H
+#define Easin_COMM_FULL_H
 
 #define IN_PREFIX "-IN"
 #define OUT_PREFIX "-OUT"
 
 template <class T> 
-class EasinCommBi {
+class EasinCommFull {
  
 public:   
         
-    EasinCommBi(std::string basePathIn, std::string basePathOut, bool reverseDirection ):
+    EasinCommFull(std::string basePathIn, std::string basePathOut, bool reverseDirection ):
     m_reverseDirection(reverseDirection),
     m_basePathIn(basePathIn),
     m_basePathOut(basePathOut)
@@ -31,7 +31,7 @@ public:
         }
     };
 
-    EasinCommBi(std::string basePath, bool reverseDirection):
+    EasinCommFull(std::string basePath, bool reverseDirection):
     m_reverseDirection(reverseDirection),
     m_basePathIn(basePath+IN_PREFIX),
     m_basePathOut(basePath+OUT_PREFIX)
@@ -49,7 +49,7 @@ public:
         }
     };    
 
-    virtual ~EasinCommBi()
+    virtual ~EasinCommFull()
     {    
         delete m_lineRead;
         delete m_lineWrite;
@@ -147,5 +147,5 @@ private:
 };
 
 
-#endif /* Easin_COMM_H */
+#endif /* Easin_COMM_FULL_H */
 

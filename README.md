@@ -13,8 +13,8 @@ It work by defaults using Named pipes FIFO, and also can use V system  Messages 
 ## ecomm concept
 
 On every half duplex communication required , it create a pipe(or a Queue ) and manage sending receiving  by proposnig the correct Api .
-That's managed by class *EasinComm* .
-So the class *EasinCommBi* that support Full Duplex haas two instace of  *EasinComm* .
+That's managed by class **EasinComm**.
+So the class **EasinCommFull** that support Full Duplex haas two instace of  **EasinComm**.
 The library doesnt not manage thead , it's no the caller responsaability.
 
 
@@ -23,7 +23,7 @@ The library doesnt not manage thead , it's no the caller responsaability.
 We call that Object that be sent or reveic in communication between process .
 It can be any class that fit soe condition :
 * have a cstructor from string , that ca ndeserialize object from that params
-* implement serialize from *src/EasinCommObj.h*
+* implement serialize from **src/EasinCommObj.h**
 ```
 class EasinCommObj {
 public:
@@ -35,10 +35,10 @@ public:
 ## How ecomm Object  is Sent/Received
 
 The serialization operation must be transorm objet params in a string where :
-- fields will be separated by *;*
-- once done , the result must be end with *END;*
+- fields will be separated by **;**
+- once done , the result must be end with **END;**
 
-Theses two constants, are defined in *src/EasinComm.h*, and can be changed if needed :
+Theses two constants, are defined in **src/EasinComm.h**, and can be changed if needed :
 ```
 #define END_STRING          "END;"
 #define END_STRING_LENGTH   4
@@ -47,7 +47,7 @@ Theses two constants, are defined in *src/EasinComm.h*, and can be changed if ne
 
 The deserialization operation shall do the oposite.
 
-An example to follw is here  *tests/EasinCommand.f*
+An example to follw is here  **tests/EasinCommand.f**
 ```
 class EasinCommand: public EasinCommObj {
 public:
@@ -84,16 +84,15 @@ private:
 ```
 
 # ecomm tests
+Tests are built by default ( we can disable that using cmake option **-DBUILD_TESTS=off** )
+We generate two binary for half and full duplex : 
+* for half duplex : **testecomm**      : 
+  * run it with params **RECEIVER** or **SENDER**
+  * This tests will send messages from Sender To Receiver 
+  * Default message amount on source code **1000000** , that will be sent on about 11m6,424s min using Fifo.
+* for Full Duplex : **testfullecomm**  :  run it with params **SIDE1** or **SIDE2**
+  * run it with params **SIDE1** or **SIDE2**
+  * This tests will send messages from SIDE To SIDE in both direction
+  * Default message amount on source code **1000000** , meaning total message exchanged are the double, that will be sent on about 10m55,380s min using Fifo.
 
 ![ecomm Tests](picts/ecomm.png?raw=true "half and full duplex tests with small amount of messages")
-
-## half duplex test
-It's built by default ( we can disable that using cmake option )
-
-
-
-
-## full duplex test
-
-
-

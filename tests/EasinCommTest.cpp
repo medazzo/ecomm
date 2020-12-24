@@ -6,7 +6,7 @@
 #include "EasinComm.h"
 #include "EasinCommand.h"
 
-int MAX_count=10 ;
+int MAX_count=1000000 ;
 int count = 1 ;
 EasinComm<EasinCommand> * Fifo = NULL;
 

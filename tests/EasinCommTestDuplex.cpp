@@ -3,14 +3,14 @@
 #include <vector>
 #include <unistd.h>
 
-#include "EasinCommBi.h"
+#include "EasinCommFull.h"
 #include "EasinCommand.h"
 
-EasinCommBi<EasinCommand> * line;
+EasinCommFull<EasinCommand> * line;
 
-int MAX_count=10 ;
+int MAX_count=1000000 ;
 
-int play(EasinCommBi<EasinCommand> * line){
+int play(EasinCommFull<EasinCommand> * line){
     int count = 1 ;
     int id=0;
     std::vector<std::string> vc;
@@ -33,7 +33,7 @@ int play(EasinCommBi<EasinCommand> * line){
     std::cout << "Send ALL !"<< std::endl;
     return 0;
 }
-int receiveFifo(EasinCommBi<EasinCommand> * line){
+int receiveFifo(EasinCommFull<EasinCommand> * line){
     int count = 1 ;
     while(count<MAX_count){
         EasinCommand * cmd = line->ReceiveCommand();
@@ -66,10 +66,10 @@ int main(int argc, char **argv) {
         return -1;
     }
     if(std::string(argv[1]) == "SIDE1" ){
-        line = new EasinCommBi<EasinCommand>(pathi, patho, false );      
+        line = new EasinCommFull<EasinCommand>(pathi, patho, false );      
     }
     else if(std::string(argv[1]) == "SIDE2" ){
-        line = new EasinCommBi<EasinCommand>(pathi, patho, true);
+        line = new EasinCommFull<EasinCommand>(pathi, patho, true);
     }else {
         std::cout << "Full duplex ! Please pick a Side  : SIDE1 | SIDE2 !!"<<std::endl;
         return -1;
