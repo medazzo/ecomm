@@ -88,7 +88,7 @@ private:
 ## half duplex test
 It's built by default ( we can disable that using cmake option )
 
-![plot](picts/ecomm.pnd)
+![plot](picts/ecomm.png)
 
 
 ## full duplex test
