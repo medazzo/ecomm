@@ -6,8 +6,8 @@ file(GLOB lib_sources "*.cpp")
 file(GLOB lib_headers "*.h")
 
 #Create library
-ADD_LIBRARY(ecomm SHARED ${lib_sources})
-
+ADD_LIBRARY(ecomm SHARED ${lib_headers} ${lib_sources})
+set_target_properties(ecomm PROPERTIES LINKER_LANGUAGE CXX)
 #
 # Check if using Message Queue is enabled, 
 # If Enbled , then will use system V Message Queue insted of Nampe Pipes.

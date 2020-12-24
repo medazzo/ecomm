@@ -3,14 +3,14 @@
 #include <vector>
 #include <unistd.h>
 
-#include "EasinCommBi.h"
+#include "EasinCommFull.h"
 #include "EasinCommand.h"
 
-EasinCommBi * line;
+EasinCommFull<EasinCommand> * line;
 
-int MAX_count=500000 ;
+int MAX_count=1000000 ;
 
-int play(EasinCommBi * line){
+int play(EasinCommFull<EasinCommand> * line){
     int count = 1 ;
     int id=0;
     std::vector<std::string> vc;
@@ -23,24 +23,26 @@ int play(EasinCommBi * line){
             std::cout<<"Write_on_IN :["<<count<<"/"<<MAX_count<<"] : Sending .. "<<id<<"." <<std::endl;
         else
             std::cout<<"Write_on_OUT:["<<count<<"/"<<MAX_count<<"] : Sending .. "<<id<<"." <<std::endl;
-        line->SendCommand(EasinCommand(std::to_string(id),"cmd",vc));   
+        EasinCommand* t = new EasinCommand(std::to_string(id),"cmd",vc);
+        line->SendCommand(t);   
         count++;
         // minimum time to wait for; unless queue will miss somes messages (not a problem for Fifo) !
         usleep(500);
+        delete t ;
     }
     std::cout << "Send ALL !"<< std::endl;
     return 0;
 }
-int receiveFifo(EasinCommBi * line){
+int receiveFifo(EasinCommFull<EasinCommand> * line){
     int count = 1 ;
     while(count<MAX_count){
         EasinCommand * cmd = line->ReceiveCommand();
         if(cmd  != NULL){
             count ++;
             if(line->IsInversed()) 
-                std::cout<<"Read_on_OUT :["<<count<<"/"<<MAX_count<<"] : Recevied  ID "<< cmd->m_id <<" >>."<<std::endl;
+                std::cout<<"Read_on_OUT :["<<count<<"/"<<MAX_count<<"] : Recevied  ID "<< cmd->getId() <<" >>."<<std::endl;
             else
-                std::cout<<"Read_on_IN  :["<<count<<"/"<<MAX_count<<"] : Recevied  ID "<< cmd->m_id <<" >>."<<std::endl;
+                std::cout<<"Read_on_IN  :["<<count<<"/"<<MAX_count<<"] : Recevied  ID "<< cmd->getId() <<" >>."<<std::endl;
             delete cmd;
         }else {
             std::cout<<"["<<count<<"/"<<MAX_count<<"] : ERROR  NULL, END of Stream :: quit >>."<<std::endl;
@@ -58,13 +60,19 @@ int receiveFifo(EasinCommBi * line){
 #define pathi "/tmp/Igifo"
 #define patho "/tmp/Ogifo"
 #endif
-int main(int argc, char **argv) {    
-     std::cout << "!   ! !! Welcome " <<argc<< std::endl;
-    if(argc == 1 ){ // No prameter Call !
-        line = new EasinCommBi(pathi, patho, false );      
+int main(int argc, char **argv) {        
+    if(argc == 1 || argc > 2  ){
+        std::cout << "Full duplex ! Please pick a Side  : SIDE1 | SIDE2 !!"<<std::endl;
+        return -1;
     }
-    else {
-        line = new EasinCommBi(pathi, patho, true);
+    if(std::string(argv[1]) == "SIDE1" ){
+        line = new EasinCommFull<EasinCommand>(pathi, patho, false );      
+    }
+    else if(std::string(argv[1]) == "SIDE2" ){
+        line = new EasinCommFull<EasinCommand>(pathi, patho, true);
+    }else {
+        std::cout << "Full duplex ! Please pick a Side  : SIDE1 | SIDE2 !!"<<std::endl;
+        return -1;
     }
 
     if(line->Initialize() < 0){
