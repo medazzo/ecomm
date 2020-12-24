@@ -85,10 +85,14 @@ private:
 
 # ecomm tests
 
+![ecomm Tests](picts/ecomm.png?raw=true "half and full duplex with small amount of message")
+
+![plot](picts/ecomm.png)
+
 ## half duplex test
 It's built by default ( we can disable that using cmake option )
 
-![plot](picts/ecomm.png)
+
 
 
 ## full duplex test
