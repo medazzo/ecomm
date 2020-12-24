@@ -8,7 +8,7 @@
 
 EposCommBi * line;
 
-int MAX_count=5 ;
+int MAX_count=500000 ;
 
 int play(EposCommBi * line){
     int count = 1 ;
@@ -41,6 +41,7 @@ int receiveFifo(EposCommBi * line){
                 std::cout<<"Read_on_OUT :["<<count<<"/"<<MAX_count<<"] : Recevied  ID "<< cmd->m_id <<" >>."<<std::endl;
             else
                 std::cout<<"Read_on_IN  :["<<count<<"/"<<MAX_count<<"] : Recevied  ID "<< cmd->m_id <<" >>."<<std::endl;
+            delete cmd;
         }else {
             std::cout<<"["<<count<<"/"<<MAX_count<<"] : ERROR  NULL, END of Stream :: quit >>."<<std::endl;
             return -1;
@@ -52,17 +53,19 @@ int receiveFifo(EposCommBi * line){
 
 //#define USE_MSG_QUE 1 // duplex is very bad with mQueue
 #ifdef USE_MSG_QUE
-#define path "/etc"
+#define pathi "/home/medazzo/test-tmp.sh"
+#define patho "/home/medazzo/stale_outputs_checked"
 #else
-#define path "/tmp/Igifo"
+#define pathi "/tmp/Igifo"
+#define patho "/tmp/Ogifo"
 #endif
 int main(int argc, char **argv) {    
      std::cout << "!   ! !! Welcome " <<argc<< std::endl;
     if(argc == 1 ){ // No prameter Call !
-        line = new EposCommBi(path);      
+        line = new EposCommBi(pathi, patho, false );      
     }
     else {
-        line = new EposCommBi(path,true);
+        line = new EposCommBi(pathi, patho, true);
     }
 
     if(line->Initialize() < 0){

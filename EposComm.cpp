@@ -11,10 +11,7 @@
 
 #define report_and_exit(msg) {perror(msg);exit(-1); /* EXIT_FAILURE */}
 
-
 #define BUFFSIZE 5
-#define IN_PREFIX "-IN"
-#define OUT_PREFIX "-OUT"
 
 
 EposComm::EposComm(std::string basePath, eposMode mode):
