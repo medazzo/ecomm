@@ -51,10 +51,9 @@ int receiveFifo(EasinCommBi * line){
     return 0;
 }
 
-//#define USE_MSG_QUE 1 // duplex is very bad with mQueue
-#ifdef USE_MSG_QUE
-#define pathi "/home/medazzo/test-tmp.sh"
-#define patho "/home/medazzo/stale_outputs_checked"
+#ifdef USE_MESSAGE_QUEUE
+#define pathi "~/.profile"
+#define patho "~/.bashrc"
 #else
 #define pathi "/tmp/Igifo"
 #define patho "/tmp/Ogifo"

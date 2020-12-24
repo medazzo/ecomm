@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.0)
 
-project(easincomm)
+project(easincomm LANGUAGES CXX)
 
 set( CMAKE_CXX_STANDARD_REQUIRED ON )
 
@@ -38,6 +38,7 @@ if( BUILD_TESTS )
     enable_testing()
     add_subdirectory( tests )
 endif( BUILD_TESTS )
+
 
 #
 # Print configuration information for the user

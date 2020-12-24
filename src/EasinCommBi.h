@@ -6,6 +6,12 @@
 #ifndef Easin_COMM_BI_H
 #define Easin_COMM_BI_H
 
+#ifdef USE_MESSAGE_QUEUE        
+    #pragma message ( "Using Message Queue !! - OK" )
+#else
+    #pragma message ( "Using Named Pipes FIFO !! - OK" )
+#endif
+
 class EasinCommBi {
  
 public:   

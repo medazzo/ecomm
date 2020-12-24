@@ -12,7 +12,7 @@ enum EasinMode{
 } ;
 
 
-#ifdef  USE_MSG_QUE
+#ifdef  USE_MESSAGE_QUEUE
 
 #define ProjectId 123
 #define MsgLen    1024
@@ -41,7 +41,7 @@ private:
     std::string m_path;
     std::string m_received;
     EasinMode    m_mode;
-#ifdef  USE_MSG_QUE
+#ifdef  USE_MESSAGE_QUEUE
     int m_qid;
 #else
     int m_fdWrite;

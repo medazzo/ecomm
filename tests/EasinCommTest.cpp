@@ -42,7 +42,7 @@ int receiveFifo(){
     return 0;
 }
 
-#ifdef USE_MSG_QUE
+#ifdef USE_MESSAGE_QUEUE
 #define path "/etc"
 #else
 #define path "/tmp/fgifo"

@@ -19,7 +19,7 @@ m_path(basePath),
 m_mode(mode),
 m_received("")
 {
-#ifdef  USE_MSG_QUE
+#ifdef  USE_MESSAGE_QUEUE
     m_qid= 0 ;    
 #else 
     m_fdWrite = 0;
@@ -32,7 +32,7 @@ EasinComm::~EasinComm()
 int EasinComm::Initialize()
 {
 //   unlink(m_path.c_str());
-#ifdef  USE_MSG_QUE
+#ifdef  USE_MESSAGE_QUEUE
     key_t key = ftok(m_path.c_str(), ProjectId);
     if (key < 0) report_and_exit("couldn't get key...");
 
@@ -74,7 +74,7 @@ int EasinComm::Initialize()
 }
 int EasinComm::Terminate()
 {
-#ifdef  USE_MSG_QUE       
+#ifdef  USE_MESSAGE_QUEUE       
     /** remove the queue **/
     if (msgctl(m_qid, IPC_RMID, NULL) < 0)  /* NULL = 'no flags' */
         report_and_exit("trouble removing queue...");
@@ -95,7 +95,7 @@ int EasinComm::SendCommand(EasinCommand  command, long type)
         return -1;
     }
     std::string cmd = command.Serialize();    
-#ifdef  USE_MSG_QUE    
+#ifdef  USE_MESSAGE_QUEUE    
     /* build the message */
     queuedMessage msg;
     msg.type = type;
@@ -117,7 +117,7 @@ EasinCommand * EasinComm::ReceiveCommand(long type){
         std::cout << "Easin comm Fail to Receive command in WRITE MODE !."<< std::endl;
         return NULL;
     }  
-#ifdef  USE_MSG_QUE 
+#ifdef  USE_MESSAGE_QUEUE 
     queuedMessage msg; /* defined in queue.h */
     if (msgrcv(m_qid, &msg, sizeof(msg), type, MSG_NOERROR  ) < 0)
       puts("msgrcv trouble...\n");
