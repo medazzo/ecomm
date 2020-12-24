@@ -6,9 +6,9 @@
 #include "EasinComm.h"
 #include "EasinCommand.h"
 
-int MAX_count=1001 ;
+int MAX_count=10000 ;
 int count = 1 ;
-EasinComm * Fifo = NULL;
+EasinComm<EasinCommand> * Fifo = NULL;
 
 int play(){
     int id=0;
@@ -19,10 +19,12 @@ int play(){
     while(count<MAX_count){
         id=count*555;
         std::cout<<"["<<count<<"/"<<MAX_count<<"] : Sending .. "<<id<<"." <<std::endl;        
-        Fifo->SendCommand(EasinCommand(std::to_string(id),"cmd",vc));   
+        EasinCommand * t = new EasinCommand(std::to_string(id),"cmd",vc);
+        Fifo->SendCommand(t);   
         count++;
         // minimum time to wait for; unless queue will miss somes messages (not a problem for Fifo) !
         usleep(500);
+        delete t;
     }
     std::cout << "Send ALL !"<< std::endl;
     return 0;
@@ -32,7 +34,7 @@ int receiveFifo(){
         EasinCommand * cmd = Fifo->ReceiveCommand();
         if(cmd  != NULL){
             count ++;
-            std::cout<<"["<<count<<"/"<<MAX_count<<"] : Recevied  ID "<< cmd->m_id <<" >>."<<std::endl;
+            std::cout<<"["<<count<<"/"<<MAX_count<<"] : Recevied  ID "<< cmd->getId() <<" >>."<<std::endl;
         }else {
             std::cout<<"["<<count<<"/"<<MAX_count<<"] : ERROR  NULL, END of Stream :: quit >>."<<std::endl;
             return -1;
@@ -49,7 +51,7 @@ int receiveFifo(){
 #endif
 int main(int argc, char **argv) {
     if(argc == 1 ){
-        Fifo = new EasinComm(path,EasinMode::ECOMM_READ);
+        Fifo = new EasinComm<EasinCommand>(path,EasinMode::ECOMM_READ);
         if(Fifo->Initialize() < 0){
             std::cout << "Error to initiate In Fifo !" << std::endl;
             return -1;
@@ -59,7 +61,7 @@ int main(int argc, char **argv) {
         test.join();
     }
     else {
-        Fifo = new EasinComm(path ,EasinMode::ECOMM_WRITE);
+        Fifo = new EasinComm<EasinCommand>(path ,EasinMode::ECOMM_WRITE);
         if(Fifo->Initialize() < 0){
             std::cout << "Error to initiate In Fifo !" << std::endl;
             return -1;
