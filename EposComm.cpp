@@ -122,7 +122,6 @@ EposCommand * EposComm::ReceiveCommand(long type){
     queuedMessage msg; /* defined in queue.h */
     if (msgrcv(m_qid, &msg, sizeof(msg), type, MSG_NOERROR  ) < 0)
       puts("msgrcv trouble...\n");
-    printf("%s received as type %i\n", msg.payload, (int) msg.type);
     return EposCommand::Deserialize(msg.payload);
 #else
     ssize_t n=0;

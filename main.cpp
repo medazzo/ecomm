@@ -19,13 +19,9 @@ int play(){
     while(count<MAX_count){
         id=count*555;
         std::cout<<"["<<count<<"/"<<MAX_count<<"] : Sending .. "<<id<<"." <<std::endl;        
-        Fifo->SendCommand(
-                EposCommand(
-                    std::to_string(id),
-                    ">>>>->->->",
-                    vc));   
+        Fifo->SendCommand(EposCommand(std::to_string(id),"cmd",vc));   
         count++;
-        // minnimum time to wait for; unless queue will miss somes messages !
+        // minimum time to wait for; unless queue will miss somes messages (not a problem for Fifo) !
         usleep(500);
     }
     std::cout << "Send ALL !"<< std::endl;
@@ -46,7 +42,7 @@ int receiveFifo(){
     return 0;
 }
 
-#ifdef  USE_MSG_QUE
+#ifdef USE_MSG_QUE
 #define path "/etc"
 #else
 #define path "/tmp/fgifo"
